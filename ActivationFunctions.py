@@ -16,11 +16,6 @@ class ActivationFunctions:
 
     @staticmethod
     def softmax(layer):
-        e_x = np.exp(layer - np.max(layer))
-        return e_x / e_x.sum()
-
-    @staticmethod
-    def softmax_matrix(layer):
         e_x = np.exp(layer - np.max(layer, axis=0))
         return e_x / e_x.sum(axis=0)
 
@@ -34,10 +29,7 @@ class ActivationFunctions:
             case "tanh":
                 return ActivationFunctions.tanh(layer)
             case "softmax":
-                if ActivationFunctions.__is_matrix(layer):
-                    return ActivationFunctions.softmax_matrix(layer)
-                else:
-                    return ActivationFunctions.softmax(layer)
+                return ActivationFunctions.softmax(layer)
             case _:
                 return layer
 
@@ -67,9 +59,3 @@ class ActivationFunctions:
                 return ActivationFunctions.derivative_tanh(layer)
             case _:
                 return np.ones((len(layer), 1))
-
-    @staticmethod
-    def __is_matrix(layer):
-        return len(layer.shape) == 2 and not (
-            layer.shape[0] == 1 or layer.shape[1] == 1
-        )
