@@ -1,5 +1,3 @@
-import time
-
 import idx2numpy
 import numpy as np
 
@@ -7,29 +5,16 @@ from NaturalLanguageNeuralNetwork import NaturalLanguageNeuralNetwork
 from NeuralNetwork import NeuralNetwork
 
 
+def prepare_numbers_nl(data):
+    return data / np.max(data)
+
+
 def prepare_numbers(data):
     data = data.reshape(data.shape[0], 784)
-    return data / 255.0
+    return data / np.max(data)
 
 
-def prepare_number_labels(data):
-    return np.eye(10)[data]
-
-
-if __name__ == "__main__":
-    train_images_file = "./MNIST/train-images.idx3-ubyte"
-    train_labels_file = "./MNIST/train-labels.idx1-ubyte"
-    test_images_file = "./MNIST/t10k-images.idx3-ubyte"
-    test_labels_file = "./MNIST/t10k-labels.idx1-ubyte"
-
-    train_images = idx2numpy.convert_from_file(train_images_file)
-    train_labels = idx2numpy.convert_from_file(train_labels_file)
-    test_images = idx2numpy.convert_from_file(test_images_file)
-    test_labels = idx2numpy.convert_from_file(test_labels_file)
-
-    train_labels = prepare_number_labels(train_labels)
-    test_labels = prepare_number_labels(test_labels)
-
+def neural_network(train_images, train_labels, test_images, test_labels):
     train_images = prepare_numbers(train_images)
     test_images = prepare_numbers(test_images)
 
@@ -57,19 +42,39 @@ if __name__ == "__main__":
     accuracy = nn.test_model(test_images, test_labels)
     print(accuracy)
 
-    # train_labels = NaturalLanguageNeuralNetwork.prepare_number_labels(train_labels)
-    # test_labels = NaturalLanguageNeuralNetwork.prepare_number_labels(test_labels)
 
-    # train_images = NaturalLanguageNeuralNetwork.prepare_numbers(train_images)
-    # test_images = NaturalLanguageNeuralNetwork.prepare_numbers(test_images)
+def natural_language_neural_network(
+    train_images, train_labels, test_images, test_labels
+):
+    train_images = prepare_numbers_nl(train_images)
+    test_images = prepare_numbers_nl(test_images)
 
-    # nn = NaturalLanguageNeuralNetwork()
-    # nn.add_kernel_layer(16, 9, activation_function="relu")
-    # nn.add_output_layer(10, train_images[0], activation_function="softmax")
+    nn = NaturalLanguageNeuralNetwork()
+    nn.add_kernel_layer(16, 9, activation_function="relu")
+    nn.add_output_layer(10, train_images[0], activation_function="softmax")
 
-    # for _ in range(10):
-    #     start = time.time()
-    #     nn.fit(train_images[:1000], train_labels[:1000])
-    #     print(time.time() - start)
+    nn.fit(train_images, train_labels, epochs=2)
 
-    # print(nn.test_model(test_images[:10000], test_labels[:10000]))
+    accuracy = nn.test_model(test_images, test_labels)
+    print(accuracy)
+
+
+def main():
+    train_images_file = "./MNIST/train-images.idx3-ubyte"
+    train_labels_file = "./MNIST/train-labels.idx1-ubyte"
+    test_images_file = "./MNIST/t10k-images.idx3-ubyte"
+    test_labels_file = "./MNIST/t10k-labels.idx1-ubyte"
+
+    train_images = idx2numpy.convert_from_file(train_images_file)
+    train_labels = idx2numpy.convert_from_file(train_labels_file)
+    test_images = idx2numpy.convert_from_file(test_images_file)
+    test_labels = idx2numpy.convert_from_file(test_labels_file)
+
+    neural_network(train_images, train_labels, test_images, test_labels)
+    # natural_language_neural_network(
+    #     train_images, train_labels, test_images, test_labels
+    # )
+
+
+if __name__ == "__main__":
+    main()

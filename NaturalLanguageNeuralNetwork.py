@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 
 import numpy as np
 
@@ -47,7 +47,11 @@ class NaturalLanguageNeuralNetwork:
         self.output_layer_activation_function = activation_function
 
     def fit(
-        self, input_images: np.ndarray, goal_outputs: np.ndarray, alpha: float = 0.01
+        self,
+        input_data: np.ndarray,
+        goal_output: np.ndarray,
+        alpha: float = 0.01,
+        epochs: int = 0,
     ):
         if self.kernel_layer is None:
             print(
@@ -60,57 +64,85 @@ class NaturalLanguageNeuralNetwork:
                 "You need to add an output layer before using fit function. Try using add_output_layer()"
             )
 
-        for series in range(len(input_images)):
-            cut_image, kernel_layer, output_layer = self.__calculate_output(
-                input_images[series]
-            )
-            flatten_kernel_layer = kernel_layer.flatten()[:, np.newaxis]
+        goal_output = self.__prepare_output_array(goal_output)
 
-            output_layer_delta = (
-                2
-                / len(output_layer)
-                * np.subtract(output_layer, goal_outputs[series, :, np.newaxis])
+        for _ in range(epochs):
+            for series in range(len(input_data)):
+                cut_image, kernel_layer, output_layer = self.__calculate_output(
+                    input_data[series]
+                )
+                flatten_kernel_layer = kernel_layer.flatten()[:, np.newaxis]
+
+                output_layer_delta = (
+                    2
+                    / len(output_layer)
+                    * np.subtract(output_layer, goal_output[series, :, np.newaxis])
+                )
+
+                kernel_layer_delta = np.matmul(
+                    self.output_layer_weights.T, output_layer_delta
+                )
+                kernel_layer_delta = kernel_layer_delta.reshape(kernel_layer.shape)
+                kernel_layer_delta *= ActivationFunctions.derivative_function(
+                    kernel_layer, self.kernel_layer_activation_function
+                )
+
+                output_layer_weights_delta = np.matmul(
+                    output_layer_delta, flatten_kernel_layer.T
+                )
+                kernel_layer_weights_delta = np.matmul(kernel_layer_delta.T, cut_image)
+
+                self.output_layer_weights -= alpha * output_layer_weights_delta
+                self.kernel_layer -= alpha * kernel_layer_weights_delta
+
+    def test_model(self, input_data: np.ndarray, goal_output: np.ndarray) -> str:
+        if self.kernel_layer is None:
+            print(
+                "You need to add a kernel layer before using fit function. Try using add_kernel_layer()"
+            )
+            return
+
+        if self.output_layer_weights is None:
+            print(
+                "You need to add an output layer before using fit function. Try using add_output_layer()"
             )
 
-            kernel_layer_delta = np.matmul(
-                self.output_layer_weights.T, output_layer_delta
-            )
-            kernel_layer_delta = kernel_layer_delta.reshape(kernel_layer.shape)
-            kernel_layer_delta *= ActivationFunctions.derivative_function(
-                kernel_layer, self.kernel_layer_activation_function
-            )
-
-            output_layer_weights_delta = np.matmul(
-                output_layer_delta, flatten_kernel_layer.T
-            )
-            kernel_layer_weights_delta = np.matmul(kernel_layer_delta.T, cut_image)
-
-            self.output_layer_weights -= alpha * output_layer_weights_delta
-            self.kernel_layer -= alpha * kernel_layer_weights_delta
-
-    def test_model(self, input_images: np.ndarray, goal_outputs: np.ndarray):
         hit = 0
+        goal_output = self.__prepare_output_array(goal_output)
 
-        for series in range(len(input_images)):
-            output_layer = self.__calculate_output(input_images[series])[2]
+        for series in range(len(input_data)):
+            output_layer = self.__calculate_output(input_data[series])[2]
 
-            if np.argmax(output_layer) == np.argmax(goal_outputs[series]):
+            if np.argmax(output_layer) == np.argmax(goal_output[series]):
                 hit += 1
 
-        avg = hit / len(input_images)
+        avg = hit / len(input_data)
         return f"{np.round(avg * 100, 2)}%"
 
-    @staticmethod
-    def prepare_numbers(data):
-        return data / 255.0
+    def predict(self, input_data: np.ndarray) -> List[float]:
+        if self.kernel_layer is None:
+            print(
+                "You need to add a kernel layer before using fit function. Try using add_kernel_layer()"
+            )
+            return
+
+        if self.output_layer_weights is None:
+            print(
+                "You need to add an output layer before using fit function. Try using add_output_layer()"
+            )
+
+        output = self.__calculate_output(input_data)[2]
+        output = ActivationFunctions.softmax(output.reshape(-1, 10)[0])
+
+        return output
 
     @staticmethod
-    def prepare_number_labels(data):
+    def __prepare_output_array(data):
         return np.eye(10)[data]
 
-    def __calculate_output(self, input_image):
+    def __calculate_output(self, input_data):
         cut_image = NaturalLanguageNeuralNetwork.__cut_image(
-            input_image, len(self.kernel_layer[0])
+            input_data, len(self.kernel_layer[0])
         )
 
         kernel_layer = np.matmul(cut_image, self.kernel_layer.T)

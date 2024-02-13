@@ -36,8 +36,8 @@ class NeuralNetwork:
 
     def fit(
         self,
-        inputs: np.ndarray,
-        goal_outputs: np.ndarray,
+        input_data: np.ndarray,
+        goal_output: np.ndarray,
         alpha: float = 0.01,
         dropout_percentage: float = 0,
         epochs: int = 1,
@@ -46,18 +46,20 @@ class NeuralNetwork:
             print("You need to create at least 1 layer using add_layer() function")
             return
 
+        goal_output = self.__prepare_output_array(goal_output)
+
         for _ in range(epochs):
-            for batch in range(len(inputs)):
+            for batch in range(len(input_data)):
                 output, binary_layers = self.__calculate_output(
-                    inputs[batch], dropout_percentage
+                    input_data[batch], dropout_percentage
                 )
 
                 output_delta = (
-                    2 / len(output) * np.subtract(output, goal_outputs[batch].T)
+                    2 / len(output) * np.subtract(output, goal_output[batch].T)
                 ) / self.batch_size
 
                 if len(self.layers) == 1:
-                    weights_delta = np.matmul(output_delta, inputs[batch])
+                    weights_delta = np.matmul(output_delta, input_data[batch])
                     self.layers[0].weights -= alpha * weights_delta
 
                 elif len(self.layers) == 2:
@@ -72,7 +74,7 @@ class NeuralNetwork:
                     output_weights_delta = np.matmul(
                         output_delta, self.layers[0].nodes.T
                     )
-                    hidden_weights_delta = np.matmul(hidden_delta, inputs[batch])
+                    hidden_weights_delta = np.matmul(hidden_delta, input_data[batch])
 
                     self.layers[1].weights -= alpha * output_weights_delta
                     self.layers[0].weights -= alpha * hidden_weights_delta
@@ -92,7 +94,7 @@ class NeuralNetwork:
 
                         if i == 0:
                             hidden_weights_delta = np.matmul(
-                                hidden_delta, inputs[batch]
+                                hidden_delta, input_data[batch]
                             )
                         else:
                             hidden_weights_delta = np.matmul(
@@ -108,16 +110,21 @@ class NeuralNetwork:
                     )
                     self.layers[-1].weights -= alpha * output_weights_delta
 
-    def test_model(self, inputs: np.ndarray, goal_outputs: np.ndarray) -> str:
+    def test_model(self, input_data: np.ndarray, goal_output: np.ndarray) -> str:
+        if len(self.layers) == 0:
+            print("You need to create at least 1 layer using add_layer() function")
+            return
+
         hit = 0
+        goal_output = self.__prepare_output_array(goal_output)
 
-        for series in range(len(inputs)):
-            output = self.__calculate_output(inputs[series])[0]
+        for series in range(len(input_data)):
+            output = self.__calculate_output(input_data[series])[0]
 
-            if np.argmax(output) == np.argmax(goal_outputs[series]):
+            if np.argmax(output) == np.argmax(goal_output[series]):
                 hit += 1
 
-        avg = hit / len(inputs)
+        avg = hit / len(input_data)
         return f"{np.round(avg * 100, 2)}%"
 
     def predict(self, input_data: np.ndarray) -> List[float]:
@@ -131,6 +138,10 @@ class NeuralNetwork:
         output = ActivationFunctions.softmax(output)
 
         return output
+
+    @staticmethod
+    def __prepare_output_array(data):
+        return np.eye(10)[data]
 
     def __calculate_output(self, inputs, dropout_percentage=0):
         prev_layer = inputs.T
