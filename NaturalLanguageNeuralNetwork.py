@@ -3,9 +3,10 @@ from typing import List, Tuple
 import numpy as np
 
 from ActivationFunctions import ActivationFunctions
+from Network import Network
 
 
-class NaturalLanguageNeuralNetwork:
+class NaturalLanguageNeuralNetwork(Network):
     def add_kernel_layer(
         self,
         num_filters: int,
@@ -63,8 +64,9 @@ class NaturalLanguageNeuralNetwork:
             print(
                 "You need to add an output layer before using fit function. Try using add_output_layer()"
             )
+            return
 
-        goal_output = self.__prepare_output_array(goal_output)
+        goal_output = Network._prepare_output_array(goal_output)
 
         for _ in range(epochs):
             for series in range(len(input_data)):
@@ -95,7 +97,7 @@ class NaturalLanguageNeuralNetwork:
                 self.output_layer_weights -= alpha * output_layer_weights_delta
                 self.kernel_layer -= alpha * kernel_layer_weights_delta
 
-    def test_model(self, input_data: np.ndarray, goal_output: np.ndarray) -> str:
+    def predict(self, input_data: np.ndarray, goal_output: np.ndarray) -> str:
         if self.kernel_layer is None:
             print(
                 "You need to add a kernel layer before using fit function. Try using add_kernel_layer()"
@@ -106,9 +108,10 @@ class NaturalLanguageNeuralNetwork:
             print(
                 "You need to add an output layer before using fit function. Try using add_output_layer()"
             )
+            return
 
         hit = 0
-        goal_output = self.__prepare_output_array(goal_output)
+        goal_output = Network._prepare_output_array(goal_output)
 
         for series in range(len(input_data)):
             output_layer = self.__calculate_output(input_data[series])[2]
@@ -119,7 +122,7 @@ class NaturalLanguageNeuralNetwork:
         avg = hit / len(input_data)
         return f"{np.round(avg * 100, 2)}%"
 
-    def predict(self, input_data: np.ndarray) -> List[float]:
+    def guess(self, input_data: np.ndarray) -> List[float]:
         if self.kernel_layer is None:
             print(
                 "You need to add a kernel layer before using fit function. Try using add_kernel_layer()"
@@ -130,15 +133,12 @@ class NaturalLanguageNeuralNetwork:
             print(
                 "You need to add an output layer before using fit function. Try using add_output_layer()"
             )
+            return
 
         output = self.__calculate_output(input_data)[2]
         output = ActivationFunctions.softmax(output.reshape(-1, 10)[0])
 
         return output
-
-    @staticmethod
-    def __prepare_output_array(data):
-        return np.eye(10)[data]
 
     def __calculate_output(self, input_data):
         cut_image = NaturalLanguageNeuralNetwork.__cut_image(

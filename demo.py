@@ -2,6 +2,7 @@ import idx2numpy
 import numpy as np
 
 from NaturalLanguageNeuralNetwork import NaturalLanguageNeuralNetwork
+from Network import Network
 from NeuralNetwork import NeuralNetwork
 
 
@@ -39,8 +40,8 @@ def neural_network(train_images, train_labels, test_images, test_labels):
 
     nn.fit(cut_train_images, cut_train_labels, epochs=100)
 
-    accuracy = nn.test_model(test_images, test_labels)
-    print(accuracy)
+    predictions = nn.predict(test_images, test_labels)
+    print(predictions)
 
 
 def natural_language_neural_network(
@@ -55,8 +56,8 @@ def natural_language_neural_network(
 
     nn.fit(train_images, train_labels, epochs=2)
 
-    accuracy = nn.test_model(test_images, test_labels)
-    print(accuracy)
+    predictions = nn.predict(test_images, test_labels)
+    print(predictions)
 
 
 def main():
@@ -70,7 +71,10 @@ def main():
     test_images = idx2numpy.convert_from_file(test_images_file)
     test_labels = idx2numpy.convert_from_file(test_labels_file)
 
-    neural_network(train_images, train_labels, test_images, test_labels)
+    n = Network()
+    print(n.confusion_matrix([0, 0, 1, 1, 0], [1, 1, 1, 1, 1], normalize=True))
+
+    # neural_network(train_images, train_labels, test_images, test_labels)
     # natural_language_neural_network(
     #     train_images, train_labels, test_images, test_labels
     # )

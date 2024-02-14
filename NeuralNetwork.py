@@ -4,9 +4,10 @@ import numpy as np
 
 from ActivationFunctions import ActivationFunctions
 from Layer import Layer
+from Network import Network
 
 
-class NeuralNetwork:
+class NeuralNetwork(Network):
     def __init__(self, num_inputs: int, batch_size: int = 1):
         self.batch_size = batch_size
         self.num_inputs = num_inputs
@@ -46,7 +47,7 @@ class NeuralNetwork:
             print("You need to create at least 1 layer using add_layer() function")
             return
 
-        goal_output = self.__prepare_output_array(goal_output)
+        goal_output = Network._prepare_output_array(goal_output)
 
         for _ in range(epochs):
             for batch in range(len(input_data)):
@@ -110,13 +111,13 @@ class NeuralNetwork:
                     )
                     self.layers[-1].weights -= alpha * output_weights_delta
 
-    def test_model(self, input_data: np.ndarray, goal_output: np.ndarray) -> str:
+    def predict(self, input_data: np.ndarray, goal_output: np.ndarray) -> str:
         if len(self.layers) == 0:
             print("You need to create at least 1 layer using add_layer() function")
             return
 
         hit = 0
-        goal_output = self.__prepare_output_array(goal_output)
+        goal_output = Network._prepare_output_array(goal_output)
 
         for series in range(len(input_data)):
             output = self.__calculate_output(input_data[series])[0]
@@ -127,7 +128,7 @@ class NeuralNetwork:
         avg = hit / len(input_data)
         return f"{np.round(avg * 100, 2)}%"
 
-    def predict(self, input_data: np.ndarray) -> List[float]:
+    def guess(self, input_data: np.ndarray) -> List[float]:
         if len(self.layers) == 0:
             print("You need to create at least 1 layer using add_layer() function")
             return
@@ -138,10 +139,6 @@ class NeuralNetwork:
         output = ActivationFunctions.softmax(output)
 
         return output
-
-    @staticmethod
-    def __prepare_output_array(data):
-        return np.eye(10)[data]
 
     def __calculate_output(self, inputs, dropout_percentage=0):
         prev_layer = inputs.T
