@@ -71,8 +71,10 @@ def main():
     test_images = idx2numpy.convert_from_file(test_images_file)
     test_labels = idx2numpy.convert_from_file(test_labels_file)
 
-    n = Network()
-    print(n.confusion_matrix([0, 0, 1, 1, 0], [1, 1, 1, 1, 1], normalize=True))
+    cm = Network.confusion_matrix([0, 0, 1, 1, 0], [1, 1, 1, 1, 1])
+    print(cm)
+    statistics = Network.get_all_statistics(cm)
+    print(statistics)
 
     # neural_network(train_images, train_labels, test_images, test_labels)
     # natural_language_neural_network(
