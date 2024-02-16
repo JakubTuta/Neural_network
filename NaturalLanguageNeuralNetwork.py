@@ -3,10 +3,9 @@ from typing import List, Tuple
 import numpy as np
 
 from ActivationFunctions import ActivationFunctions
-from Network import Network
 
 
-class NaturalLanguageNeuralNetwork(Network):
+class NaturalLanguageNeuralNetwork:
     def add_kernel_layer(
         self,
         num_filters: int,
@@ -66,7 +65,7 @@ class NaturalLanguageNeuralNetwork(Network):
             )
             return
 
-        goal_output = Network._prepare_output_array(goal_output)
+        goal_output = NaturalLanguageNeuralNetwork.__prepare_output_array(goal_output)
 
         for _ in range(epochs):
             for series in range(len(input_data)):
@@ -97,7 +96,9 @@ class NaturalLanguageNeuralNetwork(Network):
                 self.output_layer_weights -= alpha * output_layer_weights_delta
                 self.kernel_layer -= alpha * kernel_layer_weights_delta
 
-    def predict(self, input_data: np.ndarray, goal_output: np.ndarray) -> str:
+    def predict(
+        self, input_data: np.ndarray, goal_output: np.ndarray
+    ) -> np.ndarray[int]:
         if self.kernel_layer is None:
             print(
                 "You need to add a kernel layer before using fit function. Try using add_kernel_layer()"
@@ -110,17 +111,15 @@ class NaturalLanguageNeuralNetwork(Network):
             )
             return
 
-        hit = 0
-        goal_output = Network._prepare_output_array(goal_output)
+        predictions = np.zeros((len(input_data)))
+        goal_output = NaturalLanguageNeuralNetwork.__prepare_output_array(goal_output)
 
-        for series in range(len(input_data)):
-            output_layer = self.__calculate_output(input_data[series])[2]
+        for index, series in enumerate(input_data):
+            output = self.__calculate_output(series)[2]
 
-            if np.argmax(output_layer) == np.argmax(goal_output[series]):
-                hit += 1
+            predictions[index] = np.argmax(output)
 
-        avg = hit / len(input_data)
-        return f"{np.round(avg * 100, 2)}%"
+        return predictions
 
     def guess(self, input_data: np.ndarray) -> List[float]:
         if self.kernel_layer is None:
@@ -180,3 +179,7 @@ class NaturalLanguageNeuralNetwork(Network):
         cut_image = cut_image.reshape(cut_image.shape[0], mask_size)
 
         return cut_image
+
+    @staticmethod
+    def __prepare_output_array(data):
+        return np.eye(10)[data]

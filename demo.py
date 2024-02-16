@@ -1,8 +1,8 @@
 import idx2numpy
 import numpy as np
 
+from Metric import Metric
 from NaturalLanguageNeuralNetwork import NaturalLanguageNeuralNetwork
-from Network import Network
 from NeuralNetwork import NeuralNetwork
 
 
@@ -20,28 +20,19 @@ def neural_network(train_images, train_labels, test_images, test_labels):
     test_images = prepare_numbers(test_images)
 
     batch_size = 100
-    cut_train_images = np.array(
-        [
-            train_images[i : i + batch_size]
-            for i in range(0, len(train_images), batch_size)
-        ]
-    )
-    cut_train_labels = np.array(
-        [
-            train_labels[i : i + batch_size]
-            for i in range(0, len(train_labels), batch_size)
-        ]
-    )
 
     nn = NeuralNetwork(num_inputs=len(test_images[0]), batch_size=batch_size)
-    nn.add_layer(40, activation_function="relu")
-    nn.add_layer(40, activation_function="relu")
+    nn.add_layer(100, activation_function="relu")
     nn.add_layer(10, activation_function="softmax")
 
-    nn.fit(cut_train_images, cut_train_labels, epochs=100)
+    nn.fit(train_images, train_labels, epochs=20)
 
     predictions = nn.predict(test_images, test_labels)
-    print(predictions)
+
+    cm = Metric.confusion_matrix(test_labels, predictions)
+    print(cm)
+    statistics = Metric.get_all_statistics(cm)
+    print(statistics)
 
 
 def natural_language_neural_network(
@@ -57,7 +48,11 @@ def natural_language_neural_network(
     nn.fit(train_images, train_labels, epochs=2)
 
     predictions = nn.predict(test_images, test_labels)
-    print(predictions)
+
+    cm = Metric.confusion_matrix(test_labels, predictions)
+    print(cm)
+    statistics = Metric.get_all_statistics(cm)
+    print(statistics)
 
 
 def main():
@@ -71,12 +66,7 @@ def main():
     test_images = idx2numpy.convert_from_file(test_images_file)
     test_labels = idx2numpy.convert_from_file(test_labels_file)
 
-    cm = Network.confusion_matrix([0, 0, 1, 1, 0], [1, 1, 1, 1, 1])
-    print(cm)
-    statistics = Network.get_all_statistics(cm)
-    print(statistics)
-
-    # neural_network(train_images, train_labels, test_images, test_labels)
+    neural_network(train_images, train_labels, test_images, test_labels)
     # natural_language_neural_network(
     #     train_images, train_labels, test_images, test_labels
     # )

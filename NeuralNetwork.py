@@ -4,10 +4,9 @@ import numpy as np
 
 from ActivationFunctions import ActivationFunctions
 from Layer import Layer
-from Network import Network
 
 
-class NeuralNetwork(Network):
+class NeuralNetwork:
     def __init__(self, num_inputs: int, batch_size: int = 1):
         self.batch_size = batch_size
         self.num_inputs = num_inputs
@@ -47,7 +46,8 @@ class NeuralNetwork(Network):
             print("You need to create at least 1 layer using add_layer() function")
             return
 
-        goal_output = Network._prepare_output_array(goal_output)
+        input_data, goal_output = self.__cut_data(input_data, goal_output)
+        goal_output = NeuralNetwork.__prepare_output_array(goal_output)
 
         for _ in range(epochs):
             for batch in range(len(input_data)):
@@ -111,22 +111,22 @@ class NeuralNetwork(Network):
                     )
                     self.layers[-1].weights -= alpha * output_weights_delta
 
-    def predict(self, input_data: np.ndarray, goal_output: np.ndarray) -> str:
+    def predict(
+        self, input_data: np.ndarray, goal_output: np.ndarray
+    ) -> np.ndarray[int]:
         if len(self.layers) == 0:
             print("You need to create at least 1 layer using add_layer() function")
             return
 
-        hit = 0
-        goal_output = Network._prepare_output_array(goal_output)
+        predictions = np.zeros((len(input_data)))
+        goal_output = NeuralNetwork.__prepare_output_array(goal_output)
 
-        for series in range(len(input_data)):
-            output = self.__calculate_output(input_data[series])[0]
+        for index, series in enumerate(input_data):
+            output = self.__calculate_output(series)[0]
 
-            if np.argmax(output) == np.argmax(goal_output[series]):
-                hit += 1
+            predictions[index] = np.argmax(output)
 
-        avg = hit / len(input_data)
-        return f"{np.round(avg * 100, 2)}%"
+        return predictions
 
     def guess(self, input_data: np.ndarray) -> List[float]:
         if len(self.layers) == 0:
@@ -139,6 +139,15 @@ class NeuralNetwork(Network):
         output = ActivationFunctions.softmax(output)
 
         return output
+
+    def __cut_data(self, *data):
+        if self.batch_size == 1:
+            return data
+
+        return [
+            NeuralNetwork.__cut_array_into_batches(array, self.batch_size)
+            for array in data
+        ]
 
     def __calculate_output(self, inputs, dropout_percentage=0):
         prev_layer = inputs.T
@@ -169,3 +178,15 @@ class NeuralNetwork(Network):
         self.layers[-1].nodes = np.matmul(prev_weights, prev_layer)
 
         return self.layers[-1].nodes, binary_layers
+
+    @staticmethod
+    def __prepare_output_array(data):
+        return np.eye(10)[data]
+
+    @staticmethod
+    def __cut_array_into_batches(data, batch_size):
+        cut_data = np.array(
+            [data[i : i + batch_size] for i in range(0, len(data), batch_size)]
+        )
+
+        return cut_data
