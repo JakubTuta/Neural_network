@@ -15,16 +15,16 @@ class Metric:
             - Columns are predicted values
 
         In binary classification:
-        matrix[0][0] = True Positive        matrix[0][1] = False Negative
-        matrix[1][1] = False Positive       matrix[1][1] = True Negative
+            matrix[0][0] = True Positive         matrix[0][1] = False Negative\n
+            matrix[1][1] = False Positive        matrix[1][1] = True Negative
 
         Args:
-            y_actual (ndarray): 1 dimensional array of true values
-            y_predicted (ndarray): 1 dimensional array of predicted values
-            normalize (bool, optional): if set to True, all values are normalized to 1. Defaults to False
+            - y_actual (ndarray): 1 dimensional array of true values
+            - y_predicted (ndarray): 1 dimensional array of predicted values
+            - normalize (bool, optional): if set to True, all values are normalized to 1. Defaults to False
 
         Returns:
-            matrix: ndarray of shape (n_classes x n_classes)
+            - matrix: ndarray of shape (n_classes x n_classes)
         """
 
         if not Metric.__are_array_shapes_correct(y_actual, y_predicted):
@@ -53,17 +53,17 @@ class Metric:
         Accuracy is the proportion of correctly classified instances among all instances
 
         In binary classification:
-            matrix[0][0] = True Positive        matrix[0][1] = False Negative
+            matrix[0][0] = True Positive        matrix[0][1] = False Negative\n
             matrix[1][1] = False Positive       matrix[1][1] = True Negative
 
             Accuracy = (True Positive + True Negative) / (True Positive + False Negative + False Positive + True Negative)
 
         Args:
-            confusion_matrix (ndarray): 2 dimensional array
+            - confusion_matrix (ndarray): 2 dimensional array
 
         Returns:
-            float: returns value from <0, 1> representing the accuracy of the confusion matrix
-            NaN: given matrix has incorrect shape
+            - float: returns value from <0, 1> representing the accuracy of the confusion matrix
+            - NaN: given matrix has incorrect shape
         """
 
         if not Metric.__is_matrix_shape_correct(confusion_matrix):
@@ -81,7 +81,7 @@ class Metric:
         Precision measures the proportion of True Positive predictions among all positive predictions made by the model
 
         In binary classification:
-            matrix[0][0] = True Positive        matrix[0][1] = False Negative
+            matrix[0][0] = True Positive        matrix[0][1] = False Negative\n
             matrix[1][1] = False Positive       matrix[1][1] = True Negative
 
             Precision = True Positive / (True Positive + False Positive)
@@ -92,12 +92,12 @@ class Metric:
             compared to all other labels, which are treated as negative values
 
         Args:
-            confusion_matrix (ndarray): 2 dimensional array
+            - confusion_matrix (ndarray): 2 dimensional array
 
         Returns:
-            float: returns value from <0, 1> representing the accuracy of the confusion matrix,
-            ndarray[float]: representing array of precision values for each true label,
-            NaN: given matrix has incorrect shape
+            - float: returns value from <0, 1> representing the accuracy of the confusion matrix,
+            - ndarray[float]: representing array of precision values for each true label,
+            - NaN: given matrix has incorrect shape
         """
 
         if not Metric.__is_matrix_shape_correct(confusion_matrix):
@@ -133,7 +133,7 @@ class Metric:
         Recall measures the proportion of True Positive predictions among all actual positive instances in the dataset
 
         In binary classification:
-            matrix[0][0] = True Positive        matrix[0][1] = False Negative
+            matrix[0][0] = True Positive        matrix[0][1] = False Negative\n
             matrix[1][1] = False Positive       matrix[1][1] = True Negative
 
             Recall = True Positive / (True Positive + False Negative)
@@ -144,12 +144,12 @@ class Metric:
             compared to all other labels, which are treated as negative values
 
         Args:
-            confusion_matrix (ndarray): 2 dimensional array
+            - confusion_matrix (ndarray): 2 dimensional array
 
         Returns:
-            float: returns value from <0, 1> representing the recall of the confusion matrix,
-            ndarray[float]: representing array of recall values for each true label,
-            NaN: given matrix has incorrect shape
+            - float: returns value from <0, 1> representing the recall of the confusion matrix,
+            - ndarray[float]: representing array of recall values for each true label,
+            - NaN: given matrix has incorrect shape
         """
 
         if not Metric.__is_matrix_shape_correct(confusion_matrix):
@@ -185,7 +185,7 @@ class Metric:
         Specificity is the ration of True Negative predictions to the sum of Negative values
 
         In binary classification:
-            matrix[0][0] = True Positive        matrix[0][1] = False Negative
+            matrix[0][0] = True Positive        matrix[0][1] = False Negative\n
             matrix[1][1] = False Positive       matrix[1][1] = True Negative
 
             Specificity = True Negative / (False Positive + True Negative)
@@ -196,12 +196,12 @@ class Metric:
             compared to all other labels, which are treated as negative values
 
         Args:
-            confusion_matrix (ndarray): 2 dimensional array
+            - confusion_matrix (ndarray): 2 dimensional array
 
         Returns:
-            float: returns value from <0, 1> representing the specificity of the confusion matrix,
-            ndarray[float]: representing array of specificity values for each true label,
-            NaN: given matrix has incorrect shape
+            - float: returns value from <0, 1> representing the specificity of the confusion matrix,
+            - ndarray[float]: representing array of specificity values for each true label,
+            - NaN: given matrix has incorrect shape
         """
 
         if not Metric.__is_matrix_shape_correct(confusion_matrix):
@@ -250,7 +250,7 @@ class Metric:
         F1 score is the harmonic mean of precision and recall
 
         In binary classification:
-            matrix[0][0] = True Positive        matrix[0][1] = False Negative
+            matrix[0][0] = True Positive        matrix[0][1] = False Negative\n
             matrix[1][1] = False Positive       matrix[1][1] = True Negative
 
             F1 score = (2 * True Positive) / (2 * True Positive + False Positive + False Negative)
@@ -261,12 +261,12 @@ class Metric:
             compared to all other labels, which are treated as negative values
 
         Args:
-            confusion_matrix (ndarray): 2 dimensional array
+            - confusion_matrix (ndarray): 2 dimensional array
 
         Returns:
-            float: returns value from <0, 1> representing the F1 score of the confusion matrix,
-            ndarray[float]: representing array of F1 score values for each true label,
-            NaN: given matrix has incorrect shape
+            - float: returns value from <0, 1> representing the F1 score of the confusion matrix,
+            - ndarray[float]: representing array of F1 score values for each true label,
+            - NaN: given matrix has incorrect shape
         """
 
         if not Metric.__is_matrix_shape_correct(confusion_matrix):
@@ -302,10 +302,10 @@ class Metric:
         """Computes all statistics from confusion matrix
 
         Args:
-            confusion_matrix (np.ndarray): 2 dimensional array
+            - confusion_matrix (np.ndarray): 2 dimensional array
 
         Returns:
-            dict: a dictionary containing accuracy, precision, recall, specificity
+            - dictionary containing accuracy, precision, recall, specificity
         """
 
         statistics = {}
