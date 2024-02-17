@@ -87,7 +87,9 @@ class Metric:
             Precision = True Positive / (True Positive + False Positive)
 
         In multilabel classification:
-            function computes precision for each true label
+            The function implements the 'one vs rest' strategy,
+            where each label is considered as a positive value
+            compared to all other labels, which are treated as negative values
 
         Args:
             confusion_matrix (ndarray): 2 dimensional array
@@ -137,7 +139,9 @@ class Metric:
             Recall = True Positive / (True Positive + False Negative)
 
         In multilabel classification:
-            function computes recall for each true label
+            The function implements the 'one vs rest' strategy,
+            where each label is considered as a positive value
+            compared to all other labels, which are treated as negative values
 
         Args:
             confusion_matrix (ndarray): 2 dimensional array
@@ -187,7 +191,9 @@ class Metric:
             Specificity = True Negative / (False Positive + True Negative)
 
         In multilabel classification:
-            function computes specificity for each true label
+            The function implements the 'one vs rest' strategy,
+            where each label is considered as a positive value
+            compared to all other labels, which are treated as negative values
 
         Args:
             confusion_matrix (ndarray): 2 dimensional array
@@ -250,7 +256,9 @@ class Metric:
             F1 score = (2 * True Positive) / (2 * True Positive + False Positive + False Negative)
 
         In multilabel classification:
-            function computes F1 score for each true label
+            The function implements the 'one vs rest' strategy,
+            where each label is considered as a positive value
+            compared to all other labels, which are treated as negative values
 
         Args:
             confusion_matrix (ndarray): 2 dimensional array
