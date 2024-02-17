@@ -9,14 +9,20 @@ class NaturalLanguageNeuralNetwork:
     def add_kernel_layer(
         self,
         num_filters: int,
-        filter_size: int,
+        filter_size: Tuple[int, int],
         weights_range: Tuple[float, float] = (-0.01, 0.01),
         activation_function: str = None,
     ):
+        if not NaturalLanguageNeuralNetwork.__is_filter_shape_correct(filter_size):
+            print(
+                "The filter size is incorrect. Filter must consist of 2 the same odd values greater than 0"
+            )
+            return
+
         self.kernel_layer = np.random.uniform(
             low=weights_range[0],
             high=weights_range[1],
-            size=(num_filters, filter_size**2),
+            size=(num_filters, filter_size[0] ** 2),
         )
         self.kernel_layer_activation_function = activation_function
 
@@ -183,3 +189,14 @@ class NaturalLanguageNeuralNetwork:
     @staticmethod
     def __prepare_output_array(data):
         return np.eye(10)[data]
+
+    @staticmethod
+    def __is_filter_shape_correct(data):
+        return (
+            data is not None
+            and (type(data) is tuple or type(data) is list)
+            and len(data) == 2
+            and data[0] > 0
+            and data[0] % 2 == 1
+            and data[0] == data[1]
+        )
