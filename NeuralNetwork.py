@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 import numpy as np
@@ -7,6 +8,11 @@ from Layer import Layer
 
 
 class NeuralNetwork:
+    """Implementation of neural network.\n
+    A neural network consists of layers and connecting them weights,\n
+    each label, except the input layer is computed by multiplying previous layer by connecting them weight layer
+    """
+
     def __init__(self, num_inputs: int, batch_size: int = 1):
         self.batch_size = batch_size
         self.num_inputs = num_inputs
@@ -20,9 +26,10 @@ class NeuralNetwork:
         weight_max_value: float = 0.01,
         activation_function: str = None,
     ):
-        num_prev_layer = self.num_inputs
-        for layer in self.layers:
-            num_prev_layer = layer.nodes.shape[0]
+        if len(self.layers) == 0:
+            num_prev_layer = self.num_inputs
+        else:
+            num_prev_layer = self.layers[-1].nodes.shape[0]
 
         new_nodes = np.zeros((num_nodes, self.batch_size))
         new_weights = np.random.uniform(
@@ -139,6 +146,42 @@ class NeuralNetwork:
         output = ActivationFunctions.softmax(output)
 
         return output
+
+    def save_model(self, filepath: str):
+        split_filepath = filepath.split("/")
+        if len(split_filepath) > 1:
+            directory_path = "/".join(split_filepath[:-1])
+            os.makedirs(directory_path, exist_ok=True)
+
+        functions = np.array(list([layer.function for layer in self.layers]))
+
+        np.savez_compressed(
+            filepath,
+            *[layer.weights for layer in self.layers],
+            functions=functions,
+            batch_size=self.batch_size
+        )
+
+    def load_model(self, filepath: str):
+        if not filepath.endswith(".npz"):
+            filepath += ".npz"
+
+        data = np.load(filepath)
+
+        self.batch_size = data["batch_size"].item()
+        data.files.pop(data.files.index("batch_size"))
+
+        functions = data["functions"]
+        data.files.pop(data.files.index("functions"))
+
+        self.layers = []
+        for index, file in enumerate(data.files):
+            weights = data[file]
+            nodes = np.zeros((weights.shape[0], self.batch_size))
+
+            self.layers.append(Layer(nodes, weights, functions[index]))
+
+        data.close()
 
     def __cut_data(self, *data):
         if self.batch_size == 1:

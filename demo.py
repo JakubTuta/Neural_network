@@ -23,17 +23,21 @@ def neural_network(train_images, train_labels, test_images, test_labels):
 
     nn = NeuralNetwork(num_inputs=len(test_images[0]), batch_size=batch_size)
     nn.add_layer(100, activation_function="relu")
-    nn.add_layer(100, activation_function="relu")
+    # nn.add_layer(100, activation_function="relu")
     nn.add_layer(10, activation_function="softmax")
 
-    nn.fit(train_images, train_labels, epochs=1000)
+    nn.load_model("models/nn")
+
+    # nn.fit(train_images, train_labels, epochs=100)
 
     predictions = nn.predict(test_images, test_labels)
 
     cm = Metric.confusion_matrix(test_labels, predictions)
     print(cm)
     statistics = Metric.get_all_statistics(cm)
-    print(statistics)
+    print(statistics["accuracy"])
+
+    # nn.save_model("models/nn")
 
 
 def natural_language_neural_network(
@@ -67,10 +71,10 @@ def main():
     test_images = idx2numpy.convert_from_file(test_images_file)
     test_labels = idx2numpy.convert_from_file(test_labels_file)
 
-    # neural_network(train_images, train_labels, test_images, test_labels)
-    natural_language_neural_network(
-        train_images, train_labels, test_images, test_labels
-    )
+    neural_network(train_images, train_labels, test_images, test_labels)
+    # natural_language_neural_network(
+    #     train_images, train_labels, test_images, test_labels
+    # )
 
 
 if __name__ == "__main__":
