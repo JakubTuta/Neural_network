@@ -1,3 +1,4 @@
+import os
 from typing import List, Tuple
 
 import numpy as np
@@ -198,7 +199,18 @@ class NaturalLanguageNeuralNetwork:
             - filepath (str): Path to save the model.
         """
 
-        pass
+        split_filepath = filepath.split("/")
+        if len(split_filepath) > 1:
+            directory_path = "/".join(split_filepath[:-1])
+            os.makedirs(directory_path, exist_ok=True)
+
+        np.savez_compressed(
+            filepath,
+            kernel_layer=self.kernel_layer,
+            kernel_layer_function=self.kernel_layer_activation_function,
+            output_weights=self.output_layer_weights,
+            output_layer_function=self.output_layer_activation_function,
+        )
 
     def load_model(self, filepath: str):
         """Loads a trained model from a file.
@@ -207,7 +219,17 @@ class NaturalLanguageNeuralNetwork:
             - filepath (str): Path to load the model from.
         """
 
-        pass
+        if not filepath.endswith(".npz"):
+            filepath += ".npz"
+
+        data = np.load(filepath)
+
+        self.kernel_layer = data["kernel_layer"]
+        self.kernel_layer_activation_function = data["kernel_layer_function"].item()
+        self.output_layer_weights = data["output_weights"]
+        self.output_layer_activation_function = data["output_layer_function"].item()
+
+        data.close()
 
     def __calculate_output(self, input_data):
         cut_image = NaturalLanguageNeuralNetwork.__cut_image(
