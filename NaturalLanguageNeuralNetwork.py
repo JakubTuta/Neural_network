@@ -13,6 +13,15 @@ class NaturalLanguageNeuralNetwork:
         weights_range: Tuple[float, float] = (-0.01, 0.01),
         activation_function: str = None,
     ):
+        """Adds a kernel layer to the neural network.
+
+        Args:
+            - num_filters (int): Number of filters in the layer.
+            - filter_size (Tuple[int, int]): Size of each filter in the layer.
+            - weights_range (Tuple[float, float], optional): Range for initializing weights. Defaults to (-0.01, 0.01).
+            - activation_function (str, optional): Activation function for the layer. Defaults to None.
+        """
+
         if not NaturalLanguageNeuralNetwork.__is_filter_shape_correct(filter_size):
             print(
                 "The filter size is incorrect. Filter must consist of 2 the same odd values greater than 0"
@@ -33,6 +42,15 @@ class NaturalLanguageNeuralNetwork:
         weights_range: Tuple[float, float] = (-0.01, 0.01),
         activation_function: str = None,
     ):
+        """Adds an output layer to the neural network.
+
+        Args:
+            - num_nodes (int): Number of nodes in the layer.
+            - example_input (ndarray): Example input data for determining layer dimensions.
+            - weights_range (Tuple[float, float], optional): Range for initializing weights. Defaults to (-0.01, 0.01).
+            - activation_function (str, optional): Activation function for the layer. Defaults to None.
+        """
+
         if self.kernel_layer is None:
             print("You have to add a kernel layer before creating an output layer")
             return
@@ -59,6 +77,15 @@ class NaturalLanguageNeuralNetwork:
         alpha: float = 0.01,
         epochs: int = 0,
     ):
+        """Fits the neural network to the training data using backpropagation.
+
+        Args:
+            - input_data (ndarray): Input data for training.
+            - goal_output (ndarray): Desired output data for training.
+            - alpha (float, optional): Learning rate. Defaults to 0.01.
+            - epochs (int, optional): Number of training epochs. Defaults to 0.
+        """
+
         if self.kernel_layer is None:
             print(
                 "You need to add a kernel layer before using fit function. Try using add_kernel_layer()"
@@ -105,6 +132,16 @@ class NaturalLanguageNeuralNetwork:
     def predict(
         self, input_data: np.ndarray, goal_output: np.ndarray
     ) -> np.ndarray[int]:
+        """Predicts output values for input data.
+
+        Args:
+            - input_data (ndarray): Input data for prediction.
+            - goal_output (ndarray): Desired output data for prediction.
+
+        Returns:
+            - np.ndarray[int]: Predicted output values.
+        """
+
         if self.kernel_layer is None:
             print(
                 "You need to add a kernel layer before using fit function. Try using add_kernel_layer()"
@@ -128,6 +165,15 @@ class NaturalLanguageNeuralNetwork:
         return predictions
 
     def guess(self, input_data: np.ndarray) -> List[float]:
+        """Makes predictions based on input data.
+
+        Args:
+            - input_data (ndarray): Input data for making predictions.
+
+        Returns:
+            - List[float]: Predicted output values.
+        """
+
         if self.kernel_layer is None:
             print(
                 "You need to add a kernel layer before using fit function. Try using add_kernel_layer()"
@@ -144,6 +190,24 @@ class NaturalLanguageNeuralNetwork:
         output = ActivationFunctions.softmax(output.reshape(-1, 10)[0])
 
         return output
+
+    def save_model(self, filepath: str):
+        """Saves the trained model to a file.
+
+        Args:
+            - filepath (str): Path to save the model.
+        """
+
+        pass
+
+    def load_model(self, filepath: str):
+        """Loads a trained model from a file.
+
+        Args:
+            - filepath (str): Path to load the model from.
+        """
+
+        pass
 
     def __calculate_output(self, input_data):
         cut_image = NaturalLanguageNeuralNetwork.__cut_image(

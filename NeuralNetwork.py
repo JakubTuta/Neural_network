@@ -8,12 +8,20 @@ from Layer import Layer
 
 
 class NeuralNetwork:
-    """Implementation of neural network.\n
-    A neural network consists of layers and connecting them weights,\n
-    each label, except the input layer is computed by multiplying previous layer by connecting them weight layer
+    """Implementation of a neural network.
+
+    A neural network consists of layers and connecting weights,
+    where each layer computes its output by multiplying the previous layer by connecting weights.
     """
 
     def __init__(self, num_inputs: int, batch_size: int = 1):
+        """Initialize the neural network.
+
+        Args:
+            - num_inputs (int): Number of input nodes.
+            - batch_size (int, optional): Size of the batches. Defaults to 1.
+        """
+
         self.batch_size = batch_size
         self.num_inputs = num_inputs
 
@@ -26,6 +34,15 @@ class NeuralNetwork:
         weight_max_value: float = 0.01,
         activation_function: str = None,
     ):
+        """Add a layer to the neural network.
+
+        Args:
+            - num_nodes (int): Number of nodes in the layer.
+            - weight_min_value (float, optional): Minimum value for initializing weights. Defaults to -0.01.
+            - weight_max_value (float, optional): Maximum value for initializing weights. Defaults to 0.01.
+            - activation_function (str, optional): Activation function for the layer. Defaults to None.
+        """
+
         if len(self.layers) == 0:
             num_prev_layer = self.num_inputs
         else:
@@ -49,6 +66,16 @@ class NeuralNetwork:
         dropout_percentage: float = 0,
         epochs: int = 1,
     ):
+        """Train the neural network using back propagation.
+
+        Args:
+            - input_data (ndarray): Input data for training.
+            - goal_output (ndarray): Desired output data for training.
+            - alpha (float, optional): Learning rate. Defaults to 0.01.
+            - dropout_percentage (float, optional): Percentage of dropout. Defaults to 0.
+            - epochs (int, optional): Number of training epochs. Defaults to 1.
+        """
+
         if len(self.layers) == 0:
             print("You need to create at least 1 layer using add_layer() function")
             return
@@ -121,6 +148,16 @@ class NeuralNetwork:
     def predict(
         self, input_data: np.ndarray, goal_output: np.ndarray
     ) -> np.ndarray[int]:
+        """Predict output values for input data.
+
+        Args:
+            - input_data (ndarray): Input data for prediction.
+            - goal_output (ndarray): Desired output data for prediction.
+
+        Returns:
+            - ndarray[int]: Predicted output values.
+        """
+
         if len(self.layers) == 0:
             print("You need to create at least 1 layer using add_layer() function")
             return
@@ -136,6 +173,15 @@ class NeuralNetwork:
         return predictions
 
     def guess(self, input_data: np.ndarray) -> List[float]:
+        """Make predictions based on input data.
+
+        Args:
+            - input_data (ndarray): Input data for making predictions.
+
+        Returns:
+            - List[float]: Predicted output values.
+        """
+
         if len(self.layers) == 0:
             print("You need to create at least 1 layer using add_layer() function")
             return
@@ -148,6 +194,12 @@ class NeuralNetwork:
         return output
 
     def save_model(self, filepath: str):
+        """Save the trained model to a file.
+
+        Args:
+            - filepath (str): Path to save the model.
+        """
+
         split_filepath = filepath.split("/")
         if len(split_filepath) > 1:
             directory_path = "/".join(split_filepath[:-1])
@@ -163,6 +215,12 @@ class NeuralNetwork:
         )
 
     def load_model(self, filepath: str):
+        """Load a trained model from a file.
+
+        Args:
+            - filepath (str): Path to load the model from.
+        """
+
         if not filepath.endswith(".npz"):
             filepath += ".npz"
 
